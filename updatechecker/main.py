@@ -1,9 +1,22 @@
+import hashlib
 import sys
 
 import requests
 
 from updatechecker.checkers.eclipse_java import EclipseJavaChecker
 from updatechecker.checkers.jgrasp import JGraspChecker
+
+
+def _print_info(name, checker):
+    url = checker.get_latest()
+    print(name)
+    print(f'   URL: {url}')
+    print(f'  SHA1: ', end='', flush=True)
+    print(_hash_download(url))
+
+
+def _hash_download(url):
+    return hashlib.sha1(requests.get(url).content).hexdigest()
 
 
 def main():
@@ -14,9 +27,9 @@ def main():
         },
     }
     eclipse = EclipseJavaChecker(context, session)
+    _print_info('Eclipse', eclipse)
     jgrasp = JGraspChecker(context, session)
-    print(eclipse.get_latest())
-    print(jgrasp.get_latest())
+    _print_info('jGRASP', jgrasp)
     return 0
 
 
