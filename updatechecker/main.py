@@ -12,7 +12,7 @@ def _print_info(name, checker):
     print(name)
     print(f'   URL: {url}')
     print(f'  SHA1: ', end='', flush=True)
-    print(_hash_download(url))
+    print(checker.get_sha1_hash())
 
 
 def _hash_download(url):

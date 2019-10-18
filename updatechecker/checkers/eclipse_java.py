@@ -36,4 +36,14 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
         if not response:
             raise ValueError(f"Error accessing {java_release_file}: {response}")
         java_name = _java_release_name(response.content)
-        return f'{mirror_url}/{release_dir}/{java_name}{_LINUX_SUFFIX}'
+        self.latest_url =  f'{mirror_url}/{release_dir}/{java_name}{_LINUX_SUFFIX}'
+        return self.latest_url
+
+    def get_sha1_hash(self):
+        if not self.latest_url:
+            self.get_latest()
+        
+        sha1_url = f'{self.latest_url}.sha1'
+        response = self.session.get(sha1_url)
+        self.latest_sha1 = response.text.split()[0]
+        return self.latest_sha1
