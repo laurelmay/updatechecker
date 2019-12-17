@@ -11,10 +11,14 @@ _PARSER = 'html.parser'
 
 
 class JGraspChecker(BaseUpdateChecker):
-    def get_latest(self):
+    def get_latest(self, beta=False):
         download_page = self.session.get(_JGRASP_DOWNLOAD_PAGE, params=_JGRASP_DOWNLOAD_ARGS)
         soup = BeautifulSoup(download_page.content, _PARSER)
-        path = soup.find_all(attrs={'name': ';target3'})[0].get('value')
+        if beta:
+            target = ';target23'
+        else:
+            target = ';target3'
+        path = soup.find_all(attrs={'name': target})[0].get('value')
         self.latest_url = f'{_JGRASP_DOMAIN}/{_DOWNLOAD_SUBDIR}/{path}'
         return self.latest_url
 

@@ -9,7 +9,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         self.latest_sha1 = None
 
     @abc.abstractmethod
-    def get_latest(self):
+    def get_latest(self, beta=False):
         pass
 
     @abc.abstractmethod

@@ -1,14 +1,15 @@
 import hashlib
 import sys
 
+import click
 import requests
 
 from updatechecker.checkers.eclipse_java import EclipseJavaChecker
 from updatechecker.checkers.jgrasp import JGraspChecker
 
 
-def _print_info(name, checker):
-    url = checker.get_latest()
+def _print_info(name, checker, beta):
+    url = checker.get_latest(beta)
     print(name)
     print(f'   URL: {url}')
     print(f'  SHA1: ', end='', flush=True)
@@ -19,7 +20,14 @@ def _hash_download(url):
     return hashlib.sha1(requests.get(url).content).hexdigest()
 
 
-def main():
+@click.command('test-update')
+@click.option(
+    '--beta',
+    '-b',
+    is_flag=True,
+    help="Whether to accept beta flags"
+)
+def main(beta):
     session = requests.Session()
     context = {
         'eclipse': {
@@ -27,9 +35,9 @@ def main():
         },
     }
     eclipse = EclipseJavaChecker(context, session)
-    _print_info('Eclipse', eclipse)
+    _print_info('Eclipse', eclipse, beta)
     jgrasp = JGraspChecker(context, session)
-    _print_info('jGRASP', jgrasp)
+    _print_info('jGRASP', jgrasp, beta)
     return 0
 
 
