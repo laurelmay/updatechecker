@@ -18,7 +18,10 @@ class JGraspChecker(BaseUpdateChecker):
             target = ';target23'
         else:
             target = ';target3'
-        path = soup.find_all(attrs={'name': target})[0].get('value')
+        try:
+            path = soup.find_all(attrs={'name': target})[0].get('value')
+        except IndexError:
+            return None
         self.latest_url = f'{_JGRASP_DOMAIN}/{_DOWNLOAD_SUBDIR}/{path}'
         return self.latest_url
 

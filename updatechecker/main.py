@@ -11,6 +11,9 @@ from updatechecker.checkers.jgrasp import JGraspChecker
 def _print_info(name, checker, beta):
     url = checker.get_latest(beta)
     print(name)
+    if not url:
+        print(f'  Unable to determine latest{" beta" if beta else ""} version')
+        return
     print(f'   URL: {url}')
     print(f'  SHA1: ', end='', flush=True)
     print(checker.get_sha1_hash())
