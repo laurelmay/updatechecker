@@ -8,6 +8,7 @@ from botocore.exceptions import ClientError
 
 from checkers.eclipse_java import EclipseJavaChecker
 from checkers.jgrasp import JGraspChecker
+from checkers.finch_py import FinchChecker
 from checker import BaseUpdateCheckerEncoder
 
 
@@ -28,7 +29,7 @@ def load_data(s3, bucket, key):
 def remap_data(data):
     remapped = {}
     for entry in data:
-        remapped[data['software']] = data['latest']
+        remapped[entry['software']] = entry['latest']
     return remapped
 
 
@@ -44,7 +45,7 @@ def notify(name, data, topic):
     """
     sns.publish(
         TopicArn=topic,
-        message=message
+        Message=message
     )
 
 
@@ -54,6 +55,7 @@ def handler(event, context):
     beta = os.environ.get('beta', False)
 
     session = requests.Session()
+    session.headers.update({'User-Agent': 'Update Check tool'})
     context = {
         'eclipse': {
             'mirror_url': 'http://mirror.math.princeton.edu/pub/eclipse/technology/epp/downloads/release',
@@ -61,8 +63,9 @@ def handler(event, context):
     }
     eclipse = EclipseJavaChecker(context, session, beta)
     jgrasp = JGraspChecker(context, session, beta)
+    finch = FinchChecker(context, session, beta)
 
-    new_json = json.dumps([eclipse, jgrasp], indent=4, cls=BaseUpdateCheckerEncoder)
+    new_json = json.dumps([eclipse, jgrasp, finch], indent=4, cls=BaseUpdateCheckerEncoder)
     new_data = json.loads(new_json)
 
     try:
