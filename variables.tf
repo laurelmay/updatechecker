@@ -14,3 +14,8 @@ variable "function_name" {
 variable "bucket_prefix" {
   type = string
 }
+
+variable "execution_rate" {
+  type = string
+  default = "1 day"
+}

@@ -55,9 +55,9 @@ resource "aws_lambda_function" "check-function" {
 
 resource "aws_cloudwatch_event_rule" "timer-event" {
   name        = "run-check-lambda"
-  description = "Run version check Lambda every day"
+  description = "Run version check Lambda every ${var.execution_rate}"
 
-  schedule_expression = "rate(1 day)"
+  schedule_expression = "rate(${var.execution_rate})"
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
