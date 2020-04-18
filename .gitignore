@@ -125,4 +125,7 @@ dmypy.json
 .pyre/
 
 # VS Code Directory
-.vscode/
+.vscode/*.tfvars
+.terraform/
+*.tfstate*
+lambda_function_payload.zip
