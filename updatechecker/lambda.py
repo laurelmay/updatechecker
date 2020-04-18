@@ -77,7 +77,7 @@ def handler(event, context):
     # of any of the software.
     if new_data == old_data:
         return {
-            'notifications': 0,
+            'notifications': [],
             's3_write': False
         }
 
@@ -87,13 +87,13 @@ def handler(event, context):
     new_remap = remap_data(new_data)
     old_remap = remap_data(old_data)
 
-    notifications = 0
+    notifications = []
 
     for name, data in new_remap.items():
         if name not in old_remap or data != old_remap[name]:
             notify(name, data, email_topic)
-            notifications += 1
-    
+            notifications.append(name)
+
     try:
         s3.put_object(Bucket=bucket, Key=_S3_KEY, Body=new_json)
     except ClientError as err:
