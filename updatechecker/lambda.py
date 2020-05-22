@@ -55,6 +55,7 @@ def handler(event, context):
     bucket = os.environ['bucket']
     email_topic = os.environ['email_topic']
     beta = os.environ.get('beta', False)
+    force_notify = event.get('force-notify', False)
 
     session = requests.Session()
     session.headers.update({'User-Agent': 'Update Check tool'})
@@ -77,7 +78,7 @@ def handler(event, context):
 
     # There's not even a need to re-write the data if there is not a new version
     # of any of the software.
-    if new_data == old_data:
+    if new_data == old_data and not force_notify:
         return {
             'notifications': [],
             's3_write': False
@@ -92,7 +93,7 @@ def handler(event, context):
     notifications = []
 
     for name, data in new_remap.items():
-        if name not in old_remap or data != old_remap[name]:
+        if (name not in old_remap) or (data != old_remap[name]) or force_notify:
             notify(name, data, email_topic)
             notifications.append(name)
 
