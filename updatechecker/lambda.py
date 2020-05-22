@@ -35,6 +35,7 @@ def remap_data(data):
 
 def notify(name, data, topic):
     print(f"Notifying for {name}.")
+    subject = f"{name} update available"
     message = f"""
     A new version of {name} is available.
 
@@ -45,6 +46,7 @@ def notify(name, data, topic):
     """
     sns.publish(
         TopicArn=topic,
+        Subject=subject,
         Message=message
     )
 
