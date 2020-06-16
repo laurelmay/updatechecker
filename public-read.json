@@ -13,6 +13,15 @@
                 "AWS": "*"
             },
             "Resource": "${topic}"
+        },
+        {
+            "Sid": "LambdaWriteAccess",
+            "Effect": "Allow",
+            "Action": "SNS:Publish",
+            "Principal": {
+                "AWS": "${function}"
+            },
+            "Resource": "${topic}"
         }
     ]   
 }
