@@ -18,17 +18,6 @@ resource "aws_iam_role" "execution-role" {
   }
 }
 
-resource "aws_iam_role_policy" "policy" {
-  name = "s3-sns-access"
-  role = aws_iam_role.execution-role.id
-
-  policy = templatefile("lambda-role-policy.json", { 
-      bucket = aws_s3_bucket.storage.arn
-      topic = aws_sns_topic.email_topic.arn
-    }
-  )
-}
-
 resource "aws_iam_role_policy_attachment" "execution-attach" {
   role       = aws_iam_role.execution-role.name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -47,7 +36,7 @@ resource "aws_lambda_function" "check-function" {
 
   environment {
     variables = {
-      bucket = aws_s3_bucket.storage.bucket
+      bucket      = aws_s3_bucket.storage.bucket
       email_topic = aws_sns_topic.email_topic.arn
     }
   }
@@ -74,6 +63,3 @@ resource "aws_cloudwatch_event_target" "timer-target" {
   rule      = aws_cloudwatch_event_rule.timer-event.name
 }
 
-resource "aws_sns_topic" "email_topic" {
-  name_prefix = "update-email"
-}

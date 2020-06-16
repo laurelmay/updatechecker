@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Id": "__default_policy_ID",
+    "Statement": [
+        {
+            "Sid": "PublicReadAccess",
+            "Effect": "Allow",
+            "Action": [
+                "SNS:Subscribe",
+                "SNS:Receive"
+            ],
+            "Principal": {
+                "AWS": "*"
+            },
+            "Resource": "${topic}"
+        }
+    ]   
+}

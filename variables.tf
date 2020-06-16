@@ -16,6 +16,11 @@ variable "bucket_prefix" {
 }
 
 variable "execution_rate" {
-  type = string
+  type    = string
   default = "1 day"
+}
+
+variable "topic_name" {
+  type    = string
+  default = "uug-cs-vm-build-update-notify"
 }
