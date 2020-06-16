@@ -6,7 +6,7 @@ resource "aws_sns_topic_policy" "read_policy" {
   arn = aws_sns_topic.email_topic.arn
   policy = templatefile("public-read.json", {
     topic    = aws_sns_topic.email_topic.arn,
-    function = aws_lambda_function.check-function
+    function = aws_lambda_function.check-function.arn
     }
   )
 }
