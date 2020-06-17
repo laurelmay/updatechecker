@@ -1,8 +1,3 @@
-provider "aws" {
-  profile = var.profile
-  region  = var.region
-}
-
 data "aws_partition" "current" {}
 
 resource "aws_s3_bucket" "storage" {
@@ -63,3 +58,13 @@ resource "aws_cloudwatch_event_target" "timer-target" {
   rule      = aws_cloudwatch_event_rule.timer-event.name
 }
 
+resource "aws_iam_role_policy" "policy" {
+  name = "s3-sns-access"
+  role = aws_iam_role.execution-role.id
+
+  policy = templatefile("lambda-role-policy.json", {
+    bucket = aws_s3_bucket.storage.arn
+    topic  = aws_sns_topic.email_topic.arn
+    }
+  )
+}

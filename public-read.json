@@ -19,7 +19,7 @@
             "Effect": "Allow",
             "Action": "SNS:Publish",
             "Principal": {
-                "AWS": "${function}"
+                "AWS": "${function_role}"
             },
             "Resource": "${topic}"
         }
