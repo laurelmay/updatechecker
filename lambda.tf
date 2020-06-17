@@ -18,13 +18,25 @@ resource "aws_iam_role_policy_attachment" "execution-attach" {
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+data "external" "download_dependencies" {
+  program = ["python3", "package_lambda.py"]
+}
+
+data "archive_file" "lambda_archive" {
+  depends_on = [data.external.download_dependencies]
+
+  type = "zip"
+  output_path = "lambda_function_payload.zip"
+  source_dir = "updatechecker"
+}
+
 resource "aws_lambda_function" "check-function" {
   filename      = "lambda_function_payload.zip"
   function_name = var.function_name
   role          = aws_iam_role.execution-role.arn
   handler       = "lambda.handler"
 
-  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+  source_code_hash = data.archive_file.lambda_archive.output_base64sha256
 
   runtime = "python3.8"
   timeout = 5
