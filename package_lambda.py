@@ -7,7 +7,7 @@ def main():
     cmd = [
         'python3', '-m', 'pip', 'install', '-t', 'updatechecker', '-r', 'requirements.txt'
     ]
-    result = subprocess.run(cmd, capture_output=True)
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     output['args'] = " ".join(cmd)
     output['exit'] = str(result.returncode)
