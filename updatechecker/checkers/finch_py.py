@@ -17,6 +17,7 @@ _VERSION_REGEX = re.compile(
 class FinchChecker(checker.BaseUpdateChecker):
 
     name = 'Finch Python'
+    short_name = "finch"
 
     def _path_to_version(self, path):
         parsed = urllib.parse.urlparse(path)

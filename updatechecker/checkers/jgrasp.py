@@ -27,6 +27,7 @@ _VERSION_REGEX = re.compile(
 class JGraspChecker(checker.BaseUpdateChecker):
 
     name = 'jGRASP'
+    short_name = "jgrasp"
 
     def _path_to_version(self, path):
         match = _VERSION_REGEX.search(path)

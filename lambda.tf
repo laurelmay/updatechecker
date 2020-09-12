@@ -25,9 +25,9 @@ data "external" "download_dependencies" {
 data "archive_file" "lambda_archive" {
   depends_on = [data.external.download_dependencies]
 
-  type = "zip"
+  type        = "zip"
   output_path = "lambda_function_payload.zip"
-  source_dir = "updatechecker"
+  source_dir  = "updatechecker"
 }
 
 resource "aws_lambda_function" "check-function" {

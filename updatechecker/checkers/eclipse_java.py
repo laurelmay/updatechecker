@@ -28,6 +28,7 @@ def _java_release_name(java_file):
 class EclipseJavaChecker(checker.BaseUpdateChecker):
 
     name = 'Eclipse IDE for Java Developers'
+    short_name = "eclipse-java"
 
     def _load(self):
         mirror_url = self.context['eclipse']['mirror_url']

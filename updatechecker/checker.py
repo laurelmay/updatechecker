@@ -26,6 +26,16 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         """
         pass
 
+    @property
+    @abc.abstractmethod
+    def short_name(self):
+        """
+        The short name of the software.
+
+        This should be overriden as a class attribute and should conform to:
+          ^[a-z][a-z-]*[a-z]$
+        """
+
     def __init__(self, context, session, beta=False):
         self.context = context
         self.session = session
