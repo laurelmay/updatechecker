@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import checker
 
 _FINCH_DOMAIN = "https://www.birdbraintechnologies.com"
-_DOWNLOAD_PAGE = "https://www.birdbraintechnologies.com/finch/python/install/"
+_DOWNLOAD_PAGE = "https://www.birdbraintechnologies.com/finch1/python/install/"
 _PARSER = 'html.parser'
 _LINUX_TEXT = "Linux (Ubuntu)"
 
