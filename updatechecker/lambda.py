@@ -84,11 +84,7 @@ def handler(event, context):
     force_notify = event.get("force-notify", False)
 
     session = configure_session()
-    context = {
-        "eclipse": {
-            "mirror_url": "http://mirror.math.princeton.edu/pub/eclipse/technology/epp/downloads/release",
-        },
-    }
+    context = {}
     notifications = []
     for chk in [EclipseJavaChecker, JGraspChecker, FinchChecker]:
         try:
