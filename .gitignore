@@ -127,5 +127,6 @@ dmypy.json
 # VS Code Directory
 .vscode/*.tfvars
 .terraform/
+.terraform.lock.hcl
 *.tfstate*
 lambda_function_payload.zip
