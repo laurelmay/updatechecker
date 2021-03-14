@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.region  
+}
+
 data "aws_partition" "current" {}
 
 resource "aws_s3_bucket" "storage" {
