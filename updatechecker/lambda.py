@@ -1,6 +1,8 @@
 import json
-from json.decoder import JSONDecodeError
+import logging
 import os
+
+from json.decoder import JSONDecodeError
 
 import boto3
 import requests
@@ -17,6 +19,9 @@ _S3_PREFIX = os.environ.get("S3_PREFIX", "updatechecker").rstrip("/")
 
 s3 = boto3.client("s3")
 sns = boto3.client("sns")
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def s3_key(software):
@@ -39,7 +44,7 @@ def remap_data(data):
 
 
 def notify(name, data, topic):
-    print(f"Notifying for {name}.")
+    logger.info(f"Notifying for {name}.")
     subject = f"{name} update available"
     message = f"""
     A new version of {name} is available.
@@ -53,7 +58,7 @@ def notify(name, data, topic):
 
 
 def notify_failure(name, err, topic):
-    print(f"Notifying of failure for {name}")
+    logger.info(f"Notifying of failure for {name}")
     subject = f"Failed to check updates for {name}"
     message = f"""
     Error details:
@@ -90,6 +95,7 @@ def handler(event, context):
         try:
             new_data = get_latest_version_data(chk, context, session, beta)
         except Exception as exc:
+            logger.error("Error for {chk.name}", exc_info=exc)
             notify_failure(chk.name, exc, email_topic)
             continue
 
@@ -110,6 +116,7 @@ def handler(event, context):
                 Bucket=bucket, Key=s3_key(chk.short_name), Body=json.dumps(new_data)
             )
         except ClientError as err:
+            logger.error("S3 Error", exc_info=err)
             notify_failure(chk.name, f"Unable to write to S3: {err}", email_topic)
 
     return {"notifications": notifications}

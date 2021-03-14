@@ -1,30 +1,26 @@
 import xml.etree.ElementTree as ET
 
+from urllib.parse import urlparse, parse_qs
+
 import requests
 import checker
 
+DOWNLOAD_DOMAIN = "download.eclipse.org"
 API_ENDPOINT = "https://api.eclipse.org/download/release/eclipse_packages"
 
 
-def _latest_version_name(release_file, beta):
-    root = ET.fromstring(release_file)
-    if beta:
-        latest = root.find("future").text
-    else:
-        latest = root.find("present").text
-    return latest
+def build_download_url(redirect):
+    parsed_url = urlparse(redirect)
+    query_data = parse_qs(parsed_url.query)
+    file_path = query_data["file"][0]
+    return f"https://{DOWNLOAD_DOMAIN}{file_path}"
 
 
-def _java_release_name(java_file):
-    try:
-        root = ET.fromstring(java_file)
-    except:
-        print("Invalid XML")
-        print(java_file)
-        raise
-
-    name = root.find("product").get("name")
-    return name
+def dict_query(d, query):
+    if not query:
+        return d
+    queries = query.split(".")
+    return dict_query(d[queries[0]], ".".join(queries[1:]))
 
 
 class EclipseJavaChecker(checker.BaseUpdateChecker):
@@ -35,11 +31,12 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
     def _load(self):
         version_data = self.session.get(API_ENDPOINT).json()
         release = version_data["release_name"]
-        download_url = version_data["packages"]["java-package"]["files"]["linux"]["64"][
-            "url"
-        ]
+        redirect_url = dict_query(
+            version_data, "packages.java-package.files.linux.64.url"
+        )
+        download_url = build_download_url(redirect_url)
         self._latest_version = release
         self._latest_url = download_url
 
         sha_hash = requests.get(f"{download_url}.sha1").content
-        self._sha1_hash = sha_hash.decode("ascii")
+        self._sha1_hash = sha_hash.decode("ascii").split()[0]
