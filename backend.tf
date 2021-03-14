@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "terraform_state" {
-    bucket_prefix = "terraform_state"
+    bucket = "kylelaker-terraform-state"
     versioning {
       enabled = true
     }
@@ -14,15 +14,24 @@ resource "aws_s3_bucket" "terraform_state" {
 
 resource "aws_dynamodb_table" "terraform_locks" {
     name = "terraform-locks"
+    billing_mode = "PROVISIONED"
+    read_capacity = 1
+    write_capacity = 1
+    hash_key = "LockID"
+
+    attribute {
+      name = "LockID"
+      type = "S"
+    }
 }
 
 terraform {
   backend "s3" {
-      bucket = aws_s3_bucket.terraform_state
+      bucket = "kylelaker-terraform-state"
       key = "updatechecker/state"
-      region = var.region
+      region = "us-east-1"
 
-      dynamodb_table = aws_dynamodb_table.terraform_locks.topic_name
+      dynamodb_table = "terraform-locks"
       encrypt = true
   }
 }
