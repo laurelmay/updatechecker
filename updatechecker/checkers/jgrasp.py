@@ -2,7 +2,8 @@ import hashlib
 import re
 
 from bs4 import BeautifulSoup
-import checker
+
+from updatechecker import checker
 
 _JGRASP_DOMAIN = 'https://jgrasp.org'
 _JGRASP_DOWNLOAD_PAGE = 'https://spider.eng.auburn.edu/user-cgi/grasp/grasp.pl'

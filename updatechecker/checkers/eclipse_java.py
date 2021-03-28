@@ -3,7 +3,8 @@ import xml.etree.ElementTree as ET
 from urllib.parse import urlparse, parse_qs
 
 import requests
-import checker
+
+from updatechecker import checker
 
 DOWNLOAD_DOMAIN = "download.eclipse.org"
 API_ENDPOINT = "https://api.eclipse.org/download/release/eclipse_packages"

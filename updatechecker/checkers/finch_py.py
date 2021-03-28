@@ -3,7 +3,8 @@ import re
 import urllib.parse
 
 from bs4 import BeautifulSoup
-import checker
+
+from updatechecker import checker
 
 _FINCH_DOMAIN = "https://www.birdbraintechnologies.com"
 _DOWNLOAD_PAGE = "https://www.birdbraintechnologies.com/finch1/python/install/"
