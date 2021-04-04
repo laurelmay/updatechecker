@@ -19,8 +19,9 @@ def _load_checkers(directory=None):
         directory = os.path.dirname(os.path.realpath(__file__))
 
     modules = {
-        filename for filename in os.listdir(directory)
-        if filename.endswith('.py') and filename != '__init__.py'
+        filename
+        for filename in os.listdir(directory)
+        if filename.endswith(".py") and filename != "__init__.py"
     }
 
     checkers = {}
@@ -32,10 +33,9 @@ def _load_checkers(directory=None):
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         checker_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(checker_module)
-    
+
         module_contents = [
-            getattr(checker_module, module_item)
-            for module_item in dir(checker_module)
+            getattr(checker_module, module_item) for module_item in dir(checker_module)
         ]
 
         module_checkers = {
@@ -45,7 +45,7 @@ def _load_checkers(directory=None):
         }
 
         checkers.update(module_checkers)
-    
+
     return checkers
 
 

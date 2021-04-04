@@ -56,7 +56,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         """
         if self.loaded and not force_reload:
             return
-        
+
         self._load()
         self.loaded = True
 
@@ -90,20 +90,19 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
 
 
 class BaseUpdateCheckerEncoder(json.JSONEncoder):
-
     def default(self, o):
         if not isinstance(o, BaseUpdateChecker):
             json.JSONEncoder.default(self, o)
-        
+
         o.load()
 
         encoding = {
-            'software': o.name,
-            'latest': {
-                'version': o.latest_version,
-                'url': o.latest_url,
-                'sha1': o.sha1_hash,
-                'beta': bool(o.beta)
-            }
+            "software": o.name,
+            "latest": {
+                "version": o.latest_version,
+                "url": o.latest_url,
+                "sha1": o.sha1_hash,
+                "beta": bool(o.beta),
+            },
         }
         return encoding

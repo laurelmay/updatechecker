@@ -1,5 +1,3 @@
-import xml.etree.ElementTree as ET
-
 from urllib.parse import urlparse, parse_qs
 
 import requests
