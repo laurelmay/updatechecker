@@ -27,6 +27,9 @@ _VERSION_REGEX = re.compile(
 
 
 class JGraspChecker(checker.BaseUpdateChecker):
+    """
+    Check for updates for the jGRASP IDE.
+    """
 
     name = "jGRASP"
     short_name = "jgrasp"

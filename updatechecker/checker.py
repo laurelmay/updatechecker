@@ -1,5 +1,8 @@
 import abc
 import json
+from typing import Dict
+
+import requests
 
 
 class BaseUpdateChecker(metaclass=abc.ABCMeta):
@@ -18,7 +21,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
 
     @property
     @abc.abstractmethod
-    def name(self):
+    def name(self) -> str:
         """
         The name of this software.
 
@@ -28,15 +31,15 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
 
     @property
     @abc.abstractmethod
-    def short_name(self):
+    def short_name(self) -> str:
         """
         The short name of the software.
 
         This should be overriden as a class attribute and should conform to:
-          ^[a-z][a-z-]*[a-z]$
+        ``^[a-z][a-z-]*[a-z]$``.
         """
 
-    def __init__(self, context, session, beta=False):
+    def __init__(self, context: Dict, session: requests.Session, beta: bool = False):
         self.context = context
         self.session = session
         self._latest_version = None
@@ -45,7 +48,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         self.beta = beta
         self.loaded = False
 
-    def load(self, force_reload=False):
+    def load(self, force_reload: bool = False):
         """
         Load the data about the latest version.
 
@@ -68,21 +71,21 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         pass
 
     @property
-    def latest_version(self):
+    def latest_version(self) -> str:
         """
         Provide the latest version of the software.
         """
         return self._latest_version
 
     @property
-    def latest_url(self):
+    def latest_url(self) -> str:
         """
         Provide the URL of the latest version.
         """
         return self._latest_url
 
     @property
-    def sha1_hash(self):
+    def sha1_hash(self) -> str:
         """
         Provide the SHA1 hash of the latest version.
         """
@@ -90,7 +93,41 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
 
 
 class BaseUpdateCheckerEncoder(json.JSONEncoder):
+    """
+    Encodes the data from a loaded py:class:`BaseUpdateChecker` as a dictionary
+    for JSON encoding.
+    """
+
     def default(self, o):
+        """
+        Encodes ``o`` as a dictionary for JSON encoding if ``o`` is a
+        :py:class:`BaseUpdateChecker` or subclass.
+
+        The general structure looks something like:
+
+        .. code-block:: python
+
+           {
+               "software": o.name,
+               "latest": {
+                   "version": o.latest_version,
+                   "url": o.latest_url,
+                   "sha1": o.sha1_hash,
+                   "beta": bool(o.beta)
+               }
+           }
+
+        This is handled outside of the :py:class:`BaseUpdateChecker` class to
+        try to ensure consistency across various subclasses/implementations of
+        update checkers.
+
+        If ``o`` is not a :py:class:`BaseUpdateChecker` then the class is passed
+        on to :py:meth:`json.JSONEncoder.default` which may or may not know how
+        to handle the object type.
+
+        :param object o: The object to encode
+        :returns:
+        """
         if not isinstance(o, BaseUpdateChecker):
             json.JSONEncoder.default(self, o)
 

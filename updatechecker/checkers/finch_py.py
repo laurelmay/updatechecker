@@ -15,6 +15,9 @@ _VERSION_REGEX = re.compile(r"FinchPython(?P<major>\d)(?P<minor>\d+)?\.zip")
 
 
 class FinchChecker(checker.BaseUpdateChecker):
+    """
+    Check for updates to the Finch 1 Robot Python library.
+    """
 
     name = "Finch Python"
     short_name = "finch"
