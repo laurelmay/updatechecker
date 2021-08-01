@@ -1,7 +1,5 @@
 from urllib.parse import urlparse, parse_qs
 
-import requests
-
 from updatechecker import checker
 
 DOWNLOAD_DOMAIN = "download.eclipse.org"
@@ -42,7 +40,7 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
         self._latest_version = release
         self._latest_url = download_url
 
-        sha_hash_request = requests.get(f"{download_url}.sha1")
+        sha_hash_request = self.session.get(f"{download_url}.sha1")
         sha_hash_request.raise_for_status()
         sha_hash = sha_hash_request.content
         self._sha1_hash = sha_hash.decode("ascii").split()[0]

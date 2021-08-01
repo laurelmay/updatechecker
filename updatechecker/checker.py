@@ -1,8 +1,16 @@
 import abc
 import json
-from typing import Dict
+from typing import Any, Dict
 
-import requests
+try:
+    import aiohttp
+    SessionType = aiohttp.ClientSession
+except ImportError:
+    try:
+        import requests
+        SessionType = requests.Session
+    except ImportError:
+        SessionType = Any
 
 
 class BaseUpdateChecker(metaclass=abc.ABCMeta):
@@ -38,7 +46,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         ``^[a-z][a-z-]*[a-z]$``.
         """
 
-    def __init__(self, session: requests.Session, beta: bool = False, **kwargs):
+    def __init__(self, session: SessionType, beta: bool = False, **kwargs):
         self.session = session
         self._latest_version = None
         self._latest_url = None
