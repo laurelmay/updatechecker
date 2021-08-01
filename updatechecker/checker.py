@@ -9,14 +9,13 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
     """
     Provides information about the latest version of a software.
 
-    :type context: dict
-    :param context: The global context object
-
     :type session: requests.Session
     :param session: The requests session to use for queries
 
     :type beta: bool
     :param beta: Whether or not to check for a beta version
+
+    :param kwargs: Additional arguments that may be used by a checker.
     """
 
     @property
@@ -39,8 +38,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         ``^[a-z][a-z-]*[a-z]$``.
         """
 
-    def __init__(self, context: Dict, session: requests.Session, beta: bool = False):
-        self.context = context
+    def __init__(self, session: requests.Session, beta: bool = False, **kwargs):
         self.session = session
         self._latest_version = None
         self._latest_url = None
