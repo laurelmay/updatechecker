@@ -48,6 +48,9 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         self.beta = beta
         self.loaded = False
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} name={self.name!r} version={self.latest_version!r} url={self.latest_url!r} sha1={self.sha1_hash!r}>"
+
     def load(self, force_reload: bool = False):
         """
         Load the data about the latest version.
