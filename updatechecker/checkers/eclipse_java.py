@@ -31,7 +31,9 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
     short_name = "eclipse-java"
 
     def _load(self):
-        version_data = self.session.get(API_ENDPOINT).json()
+        version_data_response = self.session.get(API_ENDPOINT)
+        version_data_response.raise_for_status()
+        version_data = version_data_response.json()
         release = version_data["release_name"]
         redirect_url = _dict_query(
             version_data, "packages.java-package.files.linux.64.url"
@@ -40,5 +42,7 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
         self._latest_version = release
         self._latest_url = download_url
 
-        sha_hash = requests.get(f"{download_url}.sha1").content
+        sha_hash_request = requests.get(f"{download_url}.sha1")
+        sha_hash_request.raise_for_status()
+        sha_hash = sha_hash_request.content
         self._sha1_hash = sha_hash.decode("ascii").split()[0]

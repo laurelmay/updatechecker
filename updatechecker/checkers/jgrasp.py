@@ -55,6 +55,7 @@ class JGraspChecker(checker.BaseUpdateChecker):
         download_page = self.session.get(
             _JGRASP_DOWNLOAD_PAGE, params=_JGRASP_DOWNLOAD_ARGS
         )
+        download_page.raise_for_status()
         soup = BeautifulSoup(download_page.content, _PARSER)
         if self.beta:
             target = ";target23"
@@ -66,5 +67,7 @@ class JGraspChecker(checker.BaseUpdateChecker):
             return None
         self._latest_url = f"{_JGRASP_DOMAIN}/{_DOWNLOAD_SUBDIR}/{path}"
         self._latest_version = self._path_to_version(path)
-        data = self.session.get(self.latest_url).content
+        file_response = self.session.get(self.latest_url)
+        file_response.raise_for_status()
+        data = file_response.content
         self._sha1_hash = hashlib.sha1(data).hexdigest()
