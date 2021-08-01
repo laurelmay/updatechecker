@@ -1,7 +1,6 @@
 import importlib.util
 import inspect
 import os
-import sys
 from typing import Dict, Type
 
 from updatechecker import checker
