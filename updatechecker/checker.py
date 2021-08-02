@@ -71,6 +71,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
 
         self._load()
         self.loaded = True
+        return self
 
     @abc.abstractmethod
     def _load(self):
