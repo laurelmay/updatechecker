@@ -2,15 +2,9 @@ import abc
 import json
 from typing import Any, Dict
 
-try:
-    import aiohttp
-    SessionType = aiohttp.ClientSession
-except ImportError:
-    try:
-        import requests
-        SessionType = requests.Session
-    except ImportError:
-        SessionType = Any
+import aiohttp
+
+SessionType = aiohttp.ClientSession
 
 
 class BaseUpdateChecker(metaclass=abc.ABCMeta):
@@ -57,7 +51,7 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
     def __repr__(self):
         return f"<{self.__class__.__name__} name={self.name!r} version={self.latest_version!r} url={self.latest_url!r} sha1={self.sha1_hash!r}>"
 
-    def load(self, force_reload: bool = False):
+    async def load(self, force_reload: bool = False):
         """
         Load the data about the latest version.
 
@@ -69,12 +63,12 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
         if self.loaded and not force_reload:
             return
 
-        self._load()
+        await self._load()
         self.loaded = True
         return self
 
     @abc.abstractmethod
-    def _load(self):
+    async def _load(self):
         """
         Load implementation to be overriden by implementing classes.
         """

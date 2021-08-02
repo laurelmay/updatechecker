@@ -51,23 +51,22 @@ class JGraspChecker(checker.BaseUpdateChecker):
 
         return version_str
 
-    def _load(self):
-        download_page = self.session.get(
-            _JGRASP_DOWNLOAD_PAGE, params=_JGRASP_DOWNLOAD_ARGS
-        )
-        download_page.raise_for_status()
-        soup = BeautifulSoup(download_page.content, _PARSER)
+    async def _load(self):
+        async with self.session.get(_JGRASP_DOWNLOAD_PAGE, params=_JGRASP_DOWNLOAD_ARGS) as download_response:
+            download_page = await download_response.read()
+        
+        soup = BeautifulSoup(download_page, _PARSER)
+
         if self.beta:
             target = ";target23"
         else:
             target = ";target3"
-        try:
-            path = soup.find_all(attrs={"name": target})[0].get("value")
-        except IndexError:
-            return None
+
+        path = soup.find_all(attrs={"name": target})[0].get("value")
+
         self._latest_url = f"{_JGRASP_DOMAIN}/{_DOWNLOAD_SUBDIR}/{path}"
         self._latest_version = self._path_to_version(path)
-        file_response = self.session.get(self.latest_url)
-        file_response.raise_for_status()
-        data = file_response.content
+        async with self.session.get(self._latest_url) as file_response:
+            data = await file_response.read()
+        
         self._sha1_hash = hashlib.sha1(data).hexdigest()

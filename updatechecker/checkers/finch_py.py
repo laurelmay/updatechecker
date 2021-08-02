@@ -30,15 +30,16 @@ class FinchChecker(checker.BaseUpdateChecker):
 
         return f"{major}.{minor}"
 
-    def _load(self):
-        download_page = self.session.get(_DOWNLOAD_PAGE)
-        download_page.raise_for_status()
-        soup = BeautifulSoup(download_page.content, _PARSER)
+    async def _load(self):
+        async with self.session.get(_DOWNLOAD_PAGE) as download_response:
+            download_page = await download_response.read()
+        
+        soup = BeautifulSoup(download_page, _PARSER)
         download_link = soup.find_all("a", string=_LINUX_TEXT, limit=1)[0].get("href")
 
         self._latest_url = f"{_FINCH_DOMAIN}{download_link}"
         self._latest_version = self._path_to_version(self._latest_url)
-        file_response = self.session.get(self._latest_url)
-        file_response.raise_for_status()
-        data = file_response.content
+        async with self.session.get(self._latest_url) as file_response:
+            data = await file_response.read()
+        
         self._sha1_hash = hashlib.sha1(data).hexdigest()

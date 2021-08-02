@@ -14,18 +14,20 @@ class VirtualBoxGuestAdditionChecker(checker.BaseUpdateChecker):
     name = "VirtualBox Guest Additions"
     short_name = "vbox-guest"
 
-    def _load(self):
+    def latest_data_url(self):
         if self.beta:
-            version_data_response = self.session.get(f"{DOWNLOAD_ROOT}/LATEST-BETA.TXT")
-        else:
-            version_data_response = self.session.get(f"{DOWNLOAD_ROOT}/LATEST.TXT")
-        version_data_response.raise_for_status()
-        release = version_data_response.content.decode('utf-8').strip()
+            return f"{DOWNLOAD_ROOT}/LATEST-BETA.TXT"
+        return f"{DOWNLOAD_ROOT}/LATEST.TXT"
+
+    async def _load(self):
+        async with self.session.get(self.latest_data_url()) as version_data_response:
+            release = (await version_data_response.read()).decode('utf-8').strip()
+
         self._latest_version = release
         self._latest_url = f"{DOWNLOAD_ROOT}/{release}/VBoxGuestAdditions_{release}.iso"
 
         # VirtualBox provides SHA256 and MD5 hashes but not SHA1
-        file_response = self.session.get(self._latest_url)
-        file_response.raise_for_status()
-        data = file_response.content
+        async with self.session.get(self._latest_url) as file_response:
+            data = await file_response.read()
+        
         self._sha1_hash = hashlib.sha1(data).hexdigest()
