@@ -20,6 +20,8 @@ class BaseUpdateChecker(metaclass=abc.ABCMeta):
     :param kwargs: Additional arguments that may be used by a checker.
     """
 
+    ignored = False
+
     @property
     @abc.abstractmethod
     def name(self) -> str:

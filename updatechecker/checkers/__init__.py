@@ -15,6 +15,10 @@ def _is_subclass(sub, parent) -> bool:
     return inspect.isclass(sub) and issubclass(sub, parent)
 
 
+def _is_ignored(checker) -> bool:
+    return checker.ignored
+
+
 def _load_checkers(directory: str = None) -> Dict[str, CheckerType]:
     if not directory:
         directory = os.path.dirname(os.path.realpath(__file__))
@@ -42,7 +46,7 @@ def _load_checkers(directory: str = None) -> Dict[str, CheckerType]:
         module_checkers = {
             checker_class.short_name: checker_class
             for checker_class in module_contents
-            if _is_subclass(checker_class, checker.BaseUpdateChecker)
+            if _is_subclass(checker_class, checker.BaseUpdateChecker) and not checker_class.ignored
         }
 
         checkers.update(module_checkers)
