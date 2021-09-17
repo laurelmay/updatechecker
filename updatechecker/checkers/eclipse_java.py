@@ -39,12 +39,14 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
 
     name = "Eclipse IDE for Java Developers"
     short_name = "eclipse-java"
+    ignored = True
+    arch = None
 
     async def _load(self):
         async with self.session.get(API_ENDPOINT) as version_data_response:
             version_data = await version_data_response.json()
         release = version_data["release_name"]
-        query = "packages.java-package.files.linux.64.url"
+        query = f"packages.java-package.files.linux.{self.arch}.url"
         redirect_url = _dict_query(version_data, query)
         if redirect_url is None:
             raise EclipseApiDataError(f"Unable to query {query}", version_data)
@@ -56,3 +58,17 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
             sha_hash = await sha_hash_request.read()
 
         self._sha1_hash = sha_hash.decode("utf-8").split()[0]
+
+
+class EclipseJavaCheckerx8664(EclipseJavaChecker):
+    name = "Eclipse IDE for Java Developers (x86_64)"
+    short_name = "eclipse-java-x86_64"
+    ignored = False
+    arch = "64"
+
+
+class EclipseJavaCheckerAarch64(EclipseJavaChecker):
+    name = "Eclipse IDE for Java Developers (ARM64)"
+    short_name = "eclipse-java-arm64"
+    ignored = False
+    arch = "32"
