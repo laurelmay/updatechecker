@@ -9,7 +9,7 @@ from updatechecker import checker
 _FINCH_DOMAIN = "https://www.birdbraintechnologies.com"
 _DOWNLOAD_PAGE = "https://www.birdbraintechnologies.com/finch1/python/install/"
 _PARSER = "html.parser"
-_LINUX_TEXT = "Linux (Ubuntu)"
+_LINUX_TEXT = "Download"
 
 _VERSION_REGEX = re.compile(r"FinchPython(?P<major>\d)(?P<minor>\d+)?\.zip")
 
