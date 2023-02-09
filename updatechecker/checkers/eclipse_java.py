@@ -1,11 +1,14 @@
 import json
 
 from urllib.parse import urlparse, parse_qs
+import xml.etree.ElementTree as ET
 
 from updatechecker import checker
 
 DOWNLOAD_DOMAIN = "download.eclipse.org"
 API_ENDPOINT = "https://api.eclipse.org/download/release/eclipse_packages"
+RELEASE_BASE_URL = "https://download.eclipse.org/technology/epp/downloads/release"
+RELEASE_FILE = f"{RELEASE_BASE_URL}/release.xml"
 
 
 class EclipseApiDataError(Exception):
@@ -15,6 +18,10 @@ class EclipseApiDataError(Exception):
         self.query = query
         self.api_data = api_data
 
+class EclipseDataParsingError(Exception):
+    def __init__(self, url, message):
+        super().__init__(f"Unable to parse {url}: {message}")
+        self.url = url
 
 def _build_download_url(redirect):
     parsed_url = urlparse(redirect)
@@ -43,32 +50,36 @@ class EclipseJavaChecker(checker.BaseUpdateChecker):
     arch = None
 
     async def _load(self):
-        async with self.session.get(API_ENDPOINT) as version_data_response:
-            version_data = await version_data_response.json()
-        release = version_data["release_name"]
-        query = f"packages.java-package.files.linux.{self.arch}.url"
-        redirect_url = _dict_query(version_data, query)
-        if redirect_url is None:
-            raise EclipseApiDataError(f"Unable to query {query}", version_data)
-        download_url = _build_download_url(redirect_url)
-        self._latest_version = release
+        async with self.session.get(RELEASE_FILE) as version_data_response:
+            response_body = await version_data_response.text('utf-8')
+        version_data = ET.fromstring(response_body)
+        version_type = 'future' if self.beta else 'present'
+        present = version_data.find(version_type)
+        if present is None:
+            raise EclipseDataParsingError(RELEASE_FILE, f"No '{version_type}' key")
+        release_text = present.text
+        if not release_text:
+            raise EclipseDataParsingError(RELEASE_FILE, f"No text for '{version_type}'")
+        [release_name, release_type] = release_text.split('/')
+        download_url = f"{RELEASE_BASE_URL}/{release_text}/eclipse-java-{release_name}-{release_type}-linux-gtk-{self.arch}.tar.gz"
+        sha_url = f"{download_url}.sha1"
+        async with self.session.get(sha_url) as sha_hash_request:
+            sha_hash = await sha_hash_request.text('utf-8')
+
+        self._latest_version = release_name
         self._latest_url = download_url
-
-        async with self.session.get(f"{download_url}.sha1") as sha_hash_request:
-            sha_hash = await sha_hash_request.read()
-
-        self._sha1_hash = sha_hash.decode("utf-8").split()[0]
+        self._sha1_hash = sha_hash.split()[0]
 
 
 class EclipseJavaCheckerx8664(EclipseJavaChecker):
     name = "Eclipse IDE for Java Developers (x86_64)"
     short_name = "eclipse-java-x86_64"
     ignored = False
-    arch = "64"
+    arch = "x86_64"
 
 
 class EclipseJavaCheckerAarch64(EclipseJavaChecker):
     name = "Eclipse IDE for Java Developers (ARM64)"
     short_name = "eclipse-java-arm64"
     ignored = False
-    arch = "32"
+    arch = "aarch64"
